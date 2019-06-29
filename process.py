@@ -3,9 +3,23 @@ import glob
 import numpy as np
 from utils.utils import *
 from data.csv_parser import *
+import argparse
+
+
+def get_argparser():
+    parser = argparse.ArgumentParser(description='Smart-Cart Experiments')
+
+    parser.add_argument('--save_dir', default='./data/outputs', required=True,
+                        help='directory where you want to save the output images')
+
+    args = parser.parse_args()
+
+    return args
 
 
 def main():
+    args = get_argparser()
+    assert os.path.exists(args.save_dir)
     bgs = glob.glob("data/backgrounds/*jpg")
     for room_cnt, background_path in enumerate(bgs):
         master = Master("data/itembuilder.csv")
@@ -66,12 +80,9 @@ def main():
                      x_start:bottom_right[1]] *= (1-mask)
                 room[y_start:bottom_right[0],
                      x_start:bottom_right[1]] += chair*mask
-            os.makedirs("data/outputs", exist_ok=True)
-            save_path = "data/outputs/"+background_path.split(
+            save_path = args.save_dir+background_path.split(
                 "/")[-1].split(".")[0] + "_" + download_path.split("/")[-1]
             cv2.imwrite(save_path, room.astype("uint8"))
 
-        # show_image((room).astype("uint8"))
-        # cv
 
 main()
