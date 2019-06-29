@@ -68,9 +68,9 @@ def main():
                      x_start:bottom_right[1]] += chair*mask
             os.makedirs("data/outputs", exist_ok=True)
             save_path = "data/outputs/"+background_path.split(
-                "/")[-1].split(".")[0] + download_path.split("/")[-1]
+                "/")[-1].split(".")[0] + "_" + download_path.split("/")[-1]
             cv2.imwrite(save_path, room.astype("uint8"))
-            break
+
         # show_image((room).astype("uint8"))
         # cv
 
