@@ -20,7 +20,7 @@ class Master:
         self.median_height = heights.median()
 
     def get_item(self):
-        sku, height, item = self.csv['Sku'], self.csv[
+        sku, height, item = self.csv['Sku'][self.cnt], self.csv[
             'H'][self.cnt], self.csv['s3 link'][self.cnt]
         if "tif" in item:
             item = item.replace("[", "").replace("'", "").replace("]", "")
@@ -34,5 +34,4 @@ class Master:
                 e, "Exception, Height of Chair not found Using height of previous chair", self.prev_height)
             height = self.prev_height
         self.cnt += 1
-
         yield sku, height, item

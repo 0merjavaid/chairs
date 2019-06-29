@@ -7,8 +7,8 @@ from data.csv_parser import *
 
 def main():
     bgs = glob.glob("data/backgrounds/*jpg")
-    master = Master("data/itembuilder.csv")
     for room_cnt, background_path in enumerate(bgs):
+        master = Master("data/itembuilder.csv")
         background_mapping = parse_cfg("config/chairs.conf")
         del_bottom, bg_height, bottom_rights, shadow_intensity = background_mapping[
             background_path.split("/")[-1].split(".")[0]]
@@ -18,12 +18,12 @@ def main():
         while True:
             try:
                 sku, chair_height, download_path = next(master.get_item())
+
             except Exception as e:
                 break
             i += 1
-
             print("Creating Image: ", i, "/",
-                  master.total_items, " For room: ", room_cnt+1, "/ 5")
+                  master.total_items, " For room: ", room_cnt+1, "/ 5", sku)
             chair_path = download_img(
                 "temp/", download_path, 1)
 
@@ -36,11 +36,11 @@ def main():
             try:
                 h, w = chair.shape[:2]
             except Exception as e:
-                print ("Skipping", sku)
+                print ("Skipping Corrupt downloaded Image", sku, download_path)
                 continue
+
             resized_h, resized_w = resize_conversion(
                 chair, bg_height, max_height, chair_height)
-
             mask = get_mask(chair.copy())
 
             mask, chair = cv2.resize(
@@ -60,15 +60,17 @@ def main():
                 room = room * \
                     get_shadow(
                         room, shadow_x=int((bottom_right[1]+x_start)/2),
-                        shadow_y=int(bottom_right[0]-(bottom_right[0]*0.05)), intensity=shadow_intensity, spread_x=new_w)
+                        shadow_y=int(bottom_right[0]-(bottom_right[0]*0.05)),
+                        intensity=shadow_intensity, spread_x=new_w)
                 room[y_start:bottom_right[0],
                      x_start:bottom_right[1]] *= (1-mask)
                 room[y_start:bottom_right[0],
                      x_start:bottom_right[1]] += chair*mask
-
+            os.makedirs("data/outputs", exist_ok=True)
             save_path = "data/outputs/"+background_path.split(
                 "/")[-1].split(".")[0] + download_path.split("/")[-1]
             cv2.imwrite(save_path, room.astype("uint8"))
+            break
         # show_image((room).astype("uint8"))
         # cv
 
